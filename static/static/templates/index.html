@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>实习信息大全</title>
+
+
+    <link rel="stylesheet" href="/static/css/font-icons/font-awesome/css/font-awesome.css">
+    <link rel="stylesheet" href="/static/css/bootstrap.css">
+    <link rel="stylesheet" href="/static/css/neon-core.css">
+    <link rel="stylesheet" href="/static/css/neon-theme.css">
+    <link rel="stylesheet" href="/static/css/neon-forms.css">
+    <link rel="stylesheet" href="/static/css/maixun-neon.css">
+    <link rel="stylesheet" href="/static/css/btnStyle.css">
+    <link rel="stylesheet" href="/static/css/study.css">
+    <link rel="stylesheet" href="/static/css/shixi.css">
+
+    <script src="/static/js/jquery-1.11.0.min.js"></script>
+
+    <!--[if lt IE 9]>
+    <script src="js/ie8-responsive-file-warning.js"></script><![endif]-->
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+
+
+</head>
+<body class="page-body page-with-nav">
+
+<div class="page-container horizontal-menu sidebar-collapsed">
+    <header class="navbar">
+        <div class="container">
+            <div class="navbar-inner">
+                <div class="navbar-brand">
+                    <img src="/static/images/logo.png">
+                </div>
+                 <div class="nav_top">
+                    <ul>
+                        <li><a href="#">找实习</a></li>
+                        <li><a href="/chat">聊实习</a></li>
+                        <li><a href="#">关于我们</a></li>
+                    </ul>
+                </div>
+                <ul class="nav navbar-right pull-right">
+                    <li class="user">
+
+                            <img src="/static/images/usr_default.png" class="img-circle" width="20"/>{{user_name}}
+                    </li>
+
+                    <li>
+                        <a href="/logout">
+                            <i class="fa fa-sign-out"></i>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </header>
+    <div id="nav">
+        <ul>
+            <li class="active"><a href="#">java</a></li>
+            <li><a href="#">C++</a></li>
+            <li><a href="#">web开发</a></li>
+            <li><a href="#">python</a></li>
+            <li><a href="#">php</a></li>
+            <li><a href="#">算法</a></li>
+            <li><a href="#">Android</a></li>
+            <li><a href="#">Ios</a></li>
+            <li><a href="#">运维</a></li>
+            <li><a href="#">测试</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <div class="container" style="min-height:400px;">
+            <div class="row">
+                <div class="main-wrapper">
+                    <div class="div-hangpai">
+                        <a id="city_select_id" class="btn btn-lg btn-city-select btn-default"><i class="fa fa-map-marker"></i>{{ city }}</a>
+                    </div>
+                    <div class="div-hangpai">
+                        <input type="checkbox" style="transform: scale(1.2,1.2);" >  <span style="font-weight: bold;font-size: 16px;">大厂实习 </span> </input>
+                    </div>
+                    <div class="div-hangpai">
+                        <input type="checkbox" style="transform: scale(1.2,1.2);" >  <span style="font-weight: bold;font-size: 16px;">硕士学历 </span> </input>
+                    </div>
+                    <br/>
+                    <br/>
+                    <table class="table table-bordered" id="shixi_table">
+                        <thead>
+                            <tr>
+                                <th>实习岗位</th>
+                                <th>待遇</th>
+                                <th>公司</th>
+                                <th>来源</th>
+                                <th>日期</th>
+                            </tr>
+                        </thead>
+                        {%for info in jobinfo%}
+                        <tr>
+                                <th><a href="{{info.url}}" target="_blank">{{info.job_name}}</a></th>
+                                <th>{{info.salary}}</th>
+                                <th>{{info.company_name}}</th>
+                                <th>{{info.source}}</th>
+                                <th>{{info.publish_time}}</th>
+                        </tr>
+                        {%endfor%}
+                    </table>
+                </div>
+            </div><!--row-->
+        </div><!--container-->
+        <footer class="main">
+            Copyright&copy; 2018 Shixi Infomation
+        </footer>
+    </div><!--main-content-->
+</div>
+<!-- 弹窗 modal fade-->
+
+
+<div class="modal fade" id="modal-city-seclect">
+    <div class="modal-dialog">
+        <div class="modal-content" >
+            <form role="form" class="form-horizontal validate" novalidate="novalidate" method="post"
+                  action="javascript:void(0);">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title">城市选择</h4>
+                </div>
+                <button class="btn btn-white" data-dismiss="modal" onclick="select_city('北京')" >北京</button>
+	            <button class="btn btn-white" data-dismiss="modal" onclick="select_city('上海')">上海</button>
+	            <button class="btn btn-white" data-dismiss="modal" onclick="select_city('广州')">广州</button>
+	            <button class="btn btn-white" data-dismiss="modal" onclick="select_city('深圳')">深圳</button>
+	            <button class="btn btn-white" data-dismiss="modal" onclick="select_city('杭州')">杭州</button>
+                <div class="modal-footer">
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modal-delete-confirm">
+    <div class="modal-dialog">
+        <div class="modal-content" >
+            <form role="form" class="form-horizontal validate" novalidate="novalidate" method="post"
+                  action="javascript:void(0);">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title">删除确认</h4>
+                </div>
+
+                <div class="modal-body">
+                    <div class="alert alert-danger">确认删除？<strong>本操作无法撤销。</strong></div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-white" data-dismiss="modal">取消</button><button class="btn btn-blue" onclick = "project_delete_ensure()">确认</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- Bottom Scripts -->
+
+<script src="/static/js/bootstrap.js"></script>
+<script>
+    var del_href = ''
+    {%if download_result%}
+        window.open('{{download_path}}');
+    {% endif %}
+
+    {%if train_status%}
+        $("#remind").show();
+        var value=$('#version_list').length;
+        if(value > 0){
+            $("#version_list:first").before('<tr>' +
+                '<td>{{train_version}}</td>' + '<td>{{show_time}}</td>'
+                + '<td><i class="fa fa-cog fa-spin fa-fw"></i>模型训练中…</td>' +'</tr>');
+
+        }
+        else{
+            $("#version_table").empty().append('<thead>' +
+                '<tr>' +
+                '<th>版本名称</th>' +
+                '<th>创建日期</th>' +
+                '<th>状态</th>' +
+                '<th>操作</th>' +
+                '</tr>' +
+                '</thead>'+'<tr>' +
+                '<td>{{train_version}}</td>' + '<td>{{show_time}}</td>'
+                + '<td><i class="fa fa-cog fa-spin fa-fw"></i>模型训练中…</td>' +'</tr>');
+        }
+        location.href= '/version_manage?project={{ project_name }}&version={{train_version}}&tem_path={{tem_path}}&operate=train&email={{email}}';
+    {% endif %}
+
+    function version_train(){
+        var project_name = "{{project_name}}";
+        link = "/version_train?project=" + project_name;
+        window.location.href = link;
+    };
+
+    function select_city(to_city){
+
+        var city_html = '<i class="fa fa-map-marker" id="jobcity"></i>' + to_city
+        city_select_htm = document.getElementById('city_select_id')
+        city_select_htm.innerHTML = city_html
+        $("#modal-paper-plane").modal("hide");
+        link = "/index?city=" + to_city+ '&job_direction={{job_direction}}';
+        location.href = link;
+    }
+
+    function jump_delete_confirm(href_data) {
+        del_href = href_data;
+        $(".btn-delete").click(function(){
+            $("#modal-delete-confirm").modal("show");
+        });
+    };
+
+    function project_delete_ensure() {
+        location.href= del_href;
+    }
+    function init_menu() {
+        var menu_data = {"1":"java", "2" : "C++", "3" : "web开发", "4" : "python", "5" : "php", "6" : "算法", "7" :"Android",
+                "8" : "Ios", "9" : "运维", "10" : "测试"};
+        var menu_html = '<ul>'
+        for (var no in menu_data) {
+             if (no == {{job_direction}}) {
+                 menu_html = menu_html + '<li class="active"><a href="/index?city={{city}}'  + '&job_direction=' + no + '" >' + menu_data[no] + '</a></li>'
+                 /*menu_html = menu_html + '<li class="active"><a href="/index?city=' + {{city}} + '&job_direction=' + no + '" >' + menu_data[no] + '</a></li>'*/
+             } else {
+                menu_html = menu_html + '<li><a href="/index?city={{city}}'  + '&job_direction=' + no + '" >' + menu_data[no] + '</a></li>'
+                 /*menu_html = menu_html + '<li><a href="/index?city=' + {{city}} + '&job_direction=' + no + '" >' + menu_data[no] + '</a></li>'*/
+             }
+        }
+        menu_html = menu_html + '</ul>'
+        nav = document.getElementById('nav')
+        nav.innerHTML = menu_html
+
+    }
+    $(document).ready(function () {
+
+        init_menu();
+
+       /* $(".btn-rename").click(function(){
+            $("#modal-version-rename").modal("show");
+        });
+
+        $(".btn-delete").click(function(){
+            $("#modal-delete-confirm").modal("show");
+        });*/
+
+        $(".btn-city-select").click(function(){
+            $("#modal-city-seclect").modal("show");
+        });
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>脉讯智能迭代学习系统</title>
+
+
+    <link rel="stylesheet" href="/static/css/font-icons/font-awesome/css/font-awesome.css">
+    <link rel="stylesheet" href="/static/css/bootstrap.css">
+    <link rel="stylesheet" href="/static/css/neon-core.css">
+    <link rel="stylesheet" href="/static/css/neon-theme.css">
+    <link rel="stylesheet" href="/static/css/neon-forms.css">
+    <link rel="stylesheet" href="/static/css/maixun-neon.css">
+    <link rel="stylesheet" href="/static/css/study.css">
+
+    <script src="/static/js/jquery-1.11.0.min.js"></script>
+
+    <!--[if lt IE 9]>
+    <script src="js/ie8-responsive-file-warning.js"></script><![endif]-->
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+
+
+</head>
+<body class="page-body page-with-nav">
+
+
+<div class="page-container horizontal-menu sidebar-collapsed">
+    <header class="navbar">
+        <div class="container">
+            <div class="navbar-inner">
+                <div class="navbar-brand">
+                    <img src="/static/images/logo_study.png">
+                </div>
+                <ul class="nav navbar-right pull-right">
+                    <li class="user">
+
+                            <img src="/static/images/usr_default.png" class="img-circle" width="20"/>{{user_name}}
+                    </li>
+
+                    <li>
+                        <a href="/logout">
+                            <i class="fa fa-sign-out"></i>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </header>
+    <div id="nav">
+        <ul>
+            <li><a href="/version_manage?project={{ project_name }}">版本管理</a></li>
+            <li class="active"><a href="#">版本评估</a></li>
+            <li><a href="/version_predict?project={{ project_name }}">预测工具</a></li>
+            <li><a href="/version_cyberin_iteration?project={{project_name}}">cyberin迭代</a></li>
+            <li class="cur-project"><a href="/project_manage/" class="btn btn-default"><i class="fa fa-angle-right"></i>全部项目</a><span>项目：{{project_name}}</span> </li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <div class="container" style="min-height:400px;">
+            <div class="row">
+                <div id="target">
+                    
+                    <ul class="bread-crumb">
+                        <li><a href="#">版本评估</a></li>
+                        <li><a>评估结果</a></li>
+                    </ul>
+                </div>
+                <div class="main-wrapper">
+                    <div id="loading-container">
+                        <div class="alert alert-info text-center"><i class="fa fa-cog fa-spin fa-2x fa-fw"></i>评估中，千万别离开该页面，请耐心等待……</div>
+
+                    </div>
+
+
+                    <div id="compare-result-container">
+
+                        <div class="text-right"><button type="button" class="btn btn-lg btn-danger" onclick = "load_err_report()" ><i class="fa fa-download"></i>错误报告下载</button></div><br/>
+                        <table class="table table-bordered" id = 'effect_table'>
+                            <thead>
+                                <tr>
+                                    <th>版本名称</th>
+                                    <th>混淆矩阵</th>
+                                    <th>总体准确度</th>
+                                    <th>      各类准确度<br/>[尽量预测出的数据高准确率]</th>
+                                    <th>      召回<br/>[预测尽量不漏掉有效数据]</th>
+                                    <th>F1</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <!--<tr>-->
+                                <!--<td class="version-name"><i class="fa fa-star"></i>MeadJohnson_20181217124035</td>-->
+                                <!--<td>-->
+                                    <!--<table class="table-bordered table matrix">-->
+                                        <!--<tr><td>1</td><td>2</td></tr>-->
+                                        <!--<tr><td>3</td><td>4</td></tr>-->
+                                    <!--</table>-->
+                                <!--</td>-->
+                                <!--<td></td>-->
+                                <!--<td></td>-->
+                                <!--<td></td>-->
+                                <!--<td></td>-->
+                                <!--<td><button type="button" class="btn btn-blue btn-mark"><i class="fa fa-star"></i>选为最优</button></td>-->
+                            <!--</tr>-->
+                        </table>
+                    </div>
+                    <input type="hidden" id="download_path" />
+                    <input type="hidden" id="version_name" />
+                </div>
+            </div><!--row-->
+        </div><!--container-->
+        <footer class="main">
+            Copyright&copy; 2009-2017 Maixun Online
+        </footer>
+    </div><!--main-content-->
+</div>
+
+<script src="/static/js/gsap/main-gsap.js"></script>
+<script src="/static/js/bootstrap.js"></script>
+<script src="/static/js/resizeable.js"></script>
+<script src="/static/js/neon-custom.js"></script>
+<script src="/static/js/jquery.validate.min.js"></script>
+<script>
+
+    function set_best_version(id){
+        //var id = event.target.id;
+        var post_data = {};
+        post_data["project_name"] = "{{project_name}}"
+        post_data["version"] = id
+         $.post("/version_set_best/", post_data, function(data){
+             if (data == 'set ok') {
+                 alert("设置成功!");
+             }
+         });
+    }
+
+    function load_err_report(){
+        window.location.href = '/static/' + $("#download_path").val()
+    }
+
+    function getFormatEffect(version, mats, accuracy, precision, recall, f1){
+
+          var n = mats.length;
+          var out_all = '<table  class="table-bordered table matrix">';
+          for (var i = 0; i < n; i++) {
+              out = '<tr>'
+              for (var j=0; j < n; j++){
+                  out = out + '<td>' + mats[i][j] + '</td>';
+              }
+              out = out + '</tr>'
+              out_all = out_all + out
+          }
+          out_all = out_all + '</table>'
+          var opt_html = '<tr><td class="version-name">' +
+              version +
+              '</td><td>' + out_all +'</td><td>' +
+              accuracy +
+              '</td><td>' +
+              precision +
+              '</td><td>' +
+              recall +
+              '</td><td>' +
+              f1 +
+              '</td><td><button type="button" id=' +
+              version +
+              ' class="btn btn-blue btn-mark"  onclick="return set_best_version(this.id)" ><i class="fa fa-star"></i>选为最优</button></td></tr>';
+
+//          var opt_html = '<tr><td class="version-name">' +
+//              version +
+//              '</td><td><table class="table-bordered table matrix"><tr><td>' +
+//              mat1 +
+//              '</td><td>' +
+//              mat2 +
+//              '</td></tr><tr><td>' +
+//              mat3 +
+//              '</td><td>' +
+//              mat4 +
+//              '</td></tr></table></td><td>' +
+//              accuracy +
+//              '</td><td>' +
+//              precision +
+//              '</td><td>' +
+//              recall +
+//              '</td><td>' +
+//              f1 +
+//              '</td><td><button type="button" id=' + version + ' class="btn btn-blue btn-mark"  onclick="return set_best_version(this.id)" ><i class="fa fa-star"></i>选为最优</button></td></tr>';
+          return opt_html;
+    }
+
+    $(document).ready(function () {
+
+        $(".btn-mark").click(function(){
+            $("td>i.fa-star").remove();
+            $(this).parents("tr").find(".version-name").prepend("<i class='fa fa-star'></i>");
+
+        });
+
+        var post_data = {};
+        post_data["evaluate_info"] = '{{ evaluate_info | safe }}';
+        $.post("/version_evaluate_effect_exec/", post_data, function(j_feedback){
+
+            $("#loading-container").hide();
+
+            d_feedback=  JSON.parse(j_feedback);
+            $("#download_path").val(d_feedback['dir_path']);
+            version_effects = d_feedback['effect'];
+            table = document.getElementById('effect_table')
+            for (var version in version_effects) {
+                var mats = version_effects[version]['c_mat']
+                var recall = version_effects[version]['recall']
+                var accuracy = version_effects[version]['accuracy']
+                var f1 = version_effects[version]['f1']
+                var precision = version_effects[version]['precision']
+                opt_html = getFormatEffect(version, mats, accuracy, precision, recall, f1);
+                table.innerHTML = table.innerHTML + opt_html
+            }
+        }
+        );
+
+    });
+</script>
+</body>
+</html>

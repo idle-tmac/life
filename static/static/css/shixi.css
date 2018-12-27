@@ -1,0 +1,41 @@
+
+
+.nav_top{ width:925px;height:0px;line-height:20px;font-family:"微软雅黑";}
+  .nav_top ul { list-style: none; }
+  .nav_top ul li {
+     float:left;
+  }
+  
+  .nav_top ul li::before {
+    float:left;
+    content: "";
+    top: 20px;
+    left: 100%;
+    width: 0px;
+    height: 100%;
+    border-bottom: 2px solid #000;
+  }
+
+  .nav_top ul li a{ padding: 0px 70px; text-decoration: none;  font-weight:bold; font-size: 20px; padding-top: 20px; display: block;}
+  .nav_top ul li:hover {
+     color: red;
+  }
+
+  .nav_top ul li:hover::before {
+    left: 0%;
+    width: 100%;
+  }
+
+  .uak_a a{ color: #F40; }
+
+  .div-hangpai{ display:inline; margin:10px;}
+.hr0{/*内嵌水平线*/
+width:100%;
+margin:0 auto;
+border: 0;
+height: 0;
+border-top: 1px solid rgba(0, 0, 0, 0.1);
+border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+    size:100px;
+}
+

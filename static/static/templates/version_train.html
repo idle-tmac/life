@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>脉讯智能迭代学习系统</title>
+
+
+    <link rel="stylesheet" href="/static/css/font-icons/font-awesome/css/font-awesome.css">
+    <link rel="stylesheet" href="/static/css/bootstrap.css">
+    <link rel="stylesheet" href="/static/css/neon-core.css">
+    <link rel="stylesheet" href="/static/css/neon-theme.css">
+    <link rel="stylesheet" href="/static/css/neon-forms.css">
+    <link rel="stylesheet" href="/static/css/maixun-neon.css">
+    <link rel="stylesheet" href="/static/css/study.css">
+
+    <script src="/static/js/jquery-1.11.0.min.js"></script>
+
+    <!--[if lt IE 9]>
+    <script src="js/ie8-responsive-file-warning.js"></script><![endif]-->
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+
+
+</head>
+<body class="page-body page-with-nav">
+
+
+<div class="page-container horizontal-menu sidebar-collapsed">
+    <header class="navbar">
+        <div class="container">
+            <div class="navbar-inner">
+                <div class="navbar-brand">
+                    <img src="/static/images/logo_study.png">
+                </div>
+                <ul class="nav navbar-right pull-right">
+                    <li class="user">
+
+                            <img src="/static/images/usr_default.png" class="img-circle" width="20"/> {{user_name}}
+                    </li>
+
+                    <li>
+                        <a href="/logout">
+                            <i class="fa fa-sign-out"></i>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </header>
+    <div id="nav">
+        <ul>
+            <li class="active"><a href="/version_manage?project={{ project_name }}">版本管理</a></li>
+            <li><a href="/version_evaluate?project={{ project_name }}">版本评估</a></li>
+            <li><a href="/version_predict?project={{ project_name }}">预测工具</a></li>
+            <li><a href="/version_cyberin_iteration?project={{project_name}}">cyberin迭代</a></li>
+            <li class="cur-project"><a href="/project_manage/" class="btn btn-default"><i class="fa fa-angle-right"></i>全部项目</a><span>项目：{{ project_name }}</span> </li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <div class="container" style="min-height:400px;">
+            <div class="row">
+                <div id="target">
+                    
+                    <ul class="bread-crumb">
+                        <li><a href="/version_manage?project={{ project_name }}">版本管理</a></li>
+                        <li><a href="#">训练新版本</a></li>
+                    </ul>
+                </div>
+                <div class="main-wrapper">
+                    <div class="alert alert-warning">说明：本操作提交后最多需要过三十分钟才会生效。</div>
+                    <div>
+
+                        <!--<form role="form" class="form-horizontal validate" method="post" id="form">-->
+                        <div class="form-horizontal validate" id="+">
+                            <div class="form-group">
+                                <label for="field-1" class="col-sm-3 col-sm-offset-1 control-label">版本名：</label>
+
+                                <div class="col-sm-6">
+                                    <input type="text" class="form-control" name="versionName" id="version_name" data-validate="required" onchange="checkField()">
+                                    <label for="field-1"  class="col-sm-3 col-sm-offset-1 control-label" id = "repeat_message"></label>
+                                </div>
+
+                            </div>
+                           
+                            <div class="form-group">
+                                <label for="field-1" class="col-sm-3 col-sm-offset-1 control-label">上传样本文件：</label>
+                                <div class="col-sm-6"> 
+                                    <input type="file" class="form-control required" name="file-upload"  id = "sample_file"/>
+                                    <div class="download-sample"><a href="/static/sample/training_sample.xlsx">下载模板文件</a></div>
+                                    <p style="color: red">前五列分别为:类别，id，主题，摘要，监控词</p>
+                                </div>
+
+                            </div>
+
+                            <div class="form-group">
+                                <label for="field-1" class="col-sm-3 col-sm-offset-1 control-label">自定义特征：</label>
+                                <div class="col-sm-6">
+                                    <div class="radio">
+                                        <label class="control-label">
+                                            <input type="radio" name="advoption1" class="extra-option-toggle" value="true" id = "self_feat">是
+                                        </label>
+                                        <label class="control-label">
+                                            <input type="radio" name="advoption1" class="extra-option-toggle" value="false" id = "self_feat" checked >否
+                                        </label>
+                                        <div class="extra-option">
+                                            <div class="form-group">
+                                                <label class="col-sm-4 control-label">上传特征文件：</label>
+                                                <div class="col-sm-8">
+                                                    <input type="file" class="form-control required" name="file-upload2" id = "feat_file"/>
+                                                     <div class="download-sample"><a href="/static/sample/feature_sample.xlsx">下载话题或噪音分类模板文件</a></div>
+                                                     <div class="download-sample"><a href="/static/sample/semeval_feature_sample.xlsx">下载正负面分类模板文件</a></div>
+                                                     <p style="color: red">特征文件格式，请下载并参考特征模板</p>
+                                                </div>
+
+                                            </div>
+                                            <div class="form-group">
+                                                <div class="col-sm-12">
+                                                    <label class="control-label">
+                                                        <input type="radio" name="extra1"  value="all_by_self_feat" checked>完全使用自定义特征
+                                                    </label>
+                                                    <label class="control-label">
+                                                        <input type="radio" name="extra1"  value="extra_by_self_feat"  >辅助使用自定义特征
+                                                    </label>
+                                                </div>
+
+                                            </div>
+                                            
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="field-1" class="col-sm-3 col-sm-offset-1 control-label">使用监控词上下文特征：</label>
+                                <div class="col-sm-6">
+                                    <div class="radio">
+                                        <label class="control-label">
+                                            <input type="radio" name="advoption2" class="extra-option-toggle" value="true" >是
+                                        </label>
+                                        <label class="control-label">
+                                            <input type="radio" name="advoption2" class="extra-option-toggle" value="false" checked>否
+                                        </label>
+                                        <!--<div class="extra-option">-->
+                                            <!--<div class="form-group">-->
+                                                <!--<div class="col-sm-12">-->
+                                                    <!--监控词为原始样本中第<input type="target_column_index" id = "target_column_index" name="column" class="form-control required">列-->
+                                                <!--</div>-->
+                                                <!---->
+                                            <!--</div>-->
+                                            <!--<div class="form-group">-->
+                                                <!--<div class="col-sm-6">-->
+                                                    <!--<select class="form-control" id = "context_word_type">-->
+                                                        <!--<option>监视词前后词</option>-->
+                                                        <!--<option>监视词前后名词</option>-->
+                                                        <!--<option>监视词前后动词</option>-->
+                                                        <!--<option>监视词前后形容词</option>-->
+                                                    <!--</select>-->
+                                                <!--</div>-->
+                                            <!--</div>-->
+                                            <!--<div class="form-group">-->
+                                                <!--<div class="col-sm-6">-->
+                                                    <!--前后词个数：<input type="number" name="position" class="form-control required" id = "context_word_number">-->
+                                                <!--</div>-->
+                                            <!--</div>-->
+                                        <!--</div>-->
+                                    </div>
+                                </div>
+
+                            </div>
+
+                             <div class="form-group">
+                                <label for="field-1" class="col-sm-3 col-sm-offset-1 control-label">同向限定词：</label>
+                                <div class="col-sm-6">
+                                    <div class="radio">
+                                        <label class="control-label">
+                                            <input type="radio" name="advoption4" class="extra-option-toggle" value="true" id = "determiner">是
+                                        </label>
+                                        <label class="control-label">
+                                            <input type="radio" name="advoption4" class="extra-option-toggle" value="false" id = "determiner" checked >否
+                                        </label>
+                                        <div class="extra-option">
+                                            <div class="form-group">
+                                                <label class="col-sm-4 control-label">所属类别名称：</label>
+                                                <div class="col-sm-7">
+                                                     <input type="text" class="form-control required" name="determiner_class" id = "determiner_class"/>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+
+                                                <label class="col-sm-4 control-label">上传限定词文件：</label>
+                                                <div class="col-sm-8">
+                                                    　<input type="file" class="form-control required" name="file-upload2" id = "determiner_file"/>
+                                                     <div class="download-sample"><a href="/static/sample/feature_sample.xlsx">下载限定词模板文件</a></div>
+                                                     <p style="color: red">特征文件格式，请下载并参考特征模板</p>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <p style="color: red">(同向限定词仅针对于噪音或话题分类选用)</p>
+                                </div>
+
+                            </div>
+
+
+                            <div class="form-group">
+                                <label for="field-1" class="col-sm-3 col-sm-offset-1 control-label">算法：</label>
+                                <div class="col-sm-6">
+                                    <select class="form-control" id = "algorithm" onchange = "changeLabel()"/>
+                                        <option>话题分类-5</option>
+                                        <option>噪音分类-5</option>
+                                        <option>正负面分类</option>
+                                    </select>                               
+                                </div>                            
+                            </div>
+
+                              <div class="form-group">
+                                <label for="field-1" class="col-sm-3 col-sm-offset-1 control-label">邮件地址：</label>
+
+                                <div class="col-sm-6">
+                                    <input type="text" placeholder = "xxx@maixunbytes.com" class="form-control" name="email" id="email" data-validate="required"">
+                                    <p style="color: red">(训练完毕，若邮件通知，请在上面输入框中填写本人邮件地址)</p>
+                                </div>
+
+                            </div>
+                            <div class="form-group">
+                                <div class="col-sm-6 col-sm-offset-4">
+                                    <button type="submit" class="btn btn-blue btn-lg" id = "submitbtn">提交</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div><!--row-->
+        </div><!--container-->
+        <footer class="main">
+            Copyright&copy; 2009-2017 Maixun Online
+        </footer>
+    </div><!--main-content-->
+</div>
+<script src="/static/js/gsap/main-gsap.js"></script>
+<script src="/static/js/bootstrap.js"></script>
+<script src="/static/js/resizeable.js"></script>
+<script src="/static/js/neon-custom.js"></script>
+<script src="/static/js/jquery.validate.min.js"></script>
+<script>
+
+     function changeLabel(){
+        if ($('#algorithm').val() == "噪音分类-5"){
+            alert("噪音请标注为0，非噪音请标注为1");
+        } else if ($('#algorithm').val() == "正负面分类"){
+           alert("如果分三类： 负面标注为-1， 中立标注为0， 正面标注为1\n" +
+               "如果分两类： 负面标注为0， 正面和中立标注为1");
+        }
+    }
+    function checkField(){
+         $("#repeat_message").html("");
+         var version_name = $("#version_name").val();
+         var post_data = {};
+         post_data['version_name'] = version_name;
+         post_data['project_name'] = "{{ project_name }}";
+         $.post('/version_uniq_check/', post_data,
+             function (data) {
+                 if (data == 'false') {
+                      var htm = '<font size="8" color="#FF0000">该版本已存在，请重新命名</font>';
+                      $("#repeat_message").html(htm);
+                 }
+             }
+         );
+    }
+    $(document).ready(function () {
+
+        $("input.extra-option-toggle").click(function(){
+            var extraOption = $(this).parents(".radio").find(".extra-option");
+            if ($(this).val()=="true") {
+                extraOption.show();
+                //extraOption.find("input").attr("data-validate","required");
+            } else{
+                extraOption.hide();
+                //extraOption.find("input").attr("data-validate","");
+            }
+        });
+ 
+    });
+
+    $("#submitbtn").click(function(){
+
+        var post_data = {}
+
+        //项目名称
+        post_data['project_name'] = "{{ project_name }}";
+
+        //版本名字
+        var version_name = $("#version_name").val();
+        post_data['version_name'] = version_name.trim();
+
+        //样本文件
+        var sample_file = $("#sample_file").val().trim();
+        post_data['sample_file'] = sample_file;
+
+        //自定义特征
+        var self_feat_use = $("input[name='advoption1']:checked").val();
+        var self_feat_info = {};
+        self_feat_info["is_use"] = "false";
+        self_feat_info["feat_file"] = "";
+        self_feat_info["self_feat_use_way"] = "";
+
+        if (self_feat_use == 'true') {
+            self_feat_info["is_use"] = "true";
+            self_feat_info["feat_file"] = $("#feat_file").val().trim();
+            self_feat_info["self_feat_use_way"] = $("input[name='extra1']:checked").val();
+        }
+        post_data["self_feat_info"] = self_feat_info;
+
+        //上下文特征 ---该特征交互下掉，默认把全部上下文特征加上具体见模板。
+        var context_feat_use = $("input[name='advoption2']:checked").val();
+        var context_feat_info = {};
+        context_feat_info["is_use"] = "false";
+        context_feat_info["target_column_index"] = "";
+        context_feat_info["context_word_type"] = "";
+        context_feat_info["context_word_number"] = "";
+        if (context_feat_use == "true") {
+            context_feat_info["is_use"] = "true";
+            context_feat_info["target_column_index"]  = "4";
+            context_feat_info["context_word_type"] = "#";
+            context_feat_info["context_word_number"] =  "#";
+        }
+        post_data["context_feat_info"] = context_feat_info;
+
+        //同向限定词
+        var determiner_use = $("input[name='advoption4']:checked").val();
+        var determiner_info = {};
+        determiner_info["is_use"] = "false";
+        determiner_info["determiner_class"] ="";
+        determiner_info["determiner_file"] = "";
+
+        if (determiner_use == "true") {
+            determiner_info["is_use"] = "true";
+            determiner_info["determiner_class"] = $("#determiner_class").val().trim();
+            if (determiner_info["determiner_class"] == '') {
+                alert('请输入限定词所对应的类')
+                return;
+            }
+            determiner_info["determiner_file"] = $("#determiner_file").val().trim();
+        }
+        post_data["determiner"] = determiner_info;
+
+
+        //send email to notify
+        var email = $("#email").val().trim();
+
+
+        //算法
+        var d_algorithm_map = {'噪音分类-5' : 'LR-5', '话题分类-5' : 'LR-5',  '正负面分类': 'xgb'}
+        var algorithm1 = $("#algorithm").val();
+        post_data['task'] = algorithm1
+        post_data["algorithm"] = d_algorithm_map[algorithm1];
+
+        var j_post_data = JSON.stringify(post_data);
+
+
+        var formData = new FormData();
+        formData.append("sample_file", $('#sample_file').get(0).files[0]);
+        if (self_feat_info["feat_file"] != '') {
+            formData.append("feat_file", $('#feat_file').get(0).files[0]);
+        }
+        if (determiner_info["determiner_file"] != '') {
+            formData.append("determiner_file", $('#determiner_file').get(0).files[0]);
+        }
+        formData.append("post_data", j_post_data);
+        $.ajax({
+              url: '/version_train_exec/' ,
+              type: 'POST',
+              data: formData,
+              async: false,
+              cache: false,
+              contentType: false,
+              processData: false,
+              success: function (returndata) {
+                  var url = "/version_manage?project={{ project_name }}" + "&email=" + email + "&version=" + version_name +
+                      "&tem_path=" + returndata + '&train_status=training'
+                  location.href= url;
+              },
+              error: function (returndata) {
+                  alert("操作失败！")
+              }
+        });
+    })
+
+</script>
+</body>
+</html>

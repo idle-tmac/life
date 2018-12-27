@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>脉讯智能迭代学习系统</title>
+
+    <link rel="stylesheet" href="/static/css/font-icons/font-awesome/css/font-awesome.css">
+    <link rel="stylesheet" href="/static/css/bootstrap.css">
+    <link rel="stylesheet" href="/static/css/neon-core.css">
+    <link rel="stylesheet" href="/static/css/neon-theme.css">
+    <link rel="stylesheet" href="/static/css/neon-forms.css">
+    <link rel="stylesheet" href="/static/css/maixun-neon.css">
+    <link rel="stylesheet" href="/static/css/study.css">
+
+    <script src="/static/js/jquery-1.11.0.min.js"></script>
+
+    <!--[if lt IE 9]>
+    <script src="/static/js/ie8-responsive-file-warning.js"></script><![endif]-->
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+
+
+</head>
+<body class="page-body page-with-nav">
+
+
+<div class="page-container horizontal-menu sidebar-collapsed">
+    <header class="navbar">
+        <div class="container">
+            <div class="navbar-inner">
+                <div class="navbar-brand">
+                    <img src="/static/images/logo_study.png">
+                </div>
+                <ul class="nav navbar-right pull-right">
+                    <li class="user">
+
+                            <img src="/static/images/usr_default.png" class="img-circle" width="20"/>{{user_name}}
+                    </li>
+
+                    <li>
+                        <a href="/logout">
+                            <i class="fa fa-sign-out"></i>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </header>
+    <div id="nav">
+        <ul>
+            {%if user_name != '操作员'%}
+            　　　<li><a href="/version_manage?project={{ project_name }}">版本管理</a></li>
+            　　　<li><a href="/version_evaluate?project={{project_name}}">版本评估</a></li>
+            {%endif%}
+            <li class="active"><a href="#">预测工具</a></li>
+            {%if user_name != '操作员'%}
+                <li><a href="/version_cyberin_iteration?project={{project_name}}">cyberin迭代</a></li>
+            {%endif%}
+            <li class="cur-project"><a href="/project_manage/" class="btn btn-default"><i class="fa fa-angle-right"></i>全部项目</a><span>项目：{{project_name}}</span> </li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <div class="container" style="min-height:400px;">
+            <div class="row">
+                <div id="target">
+                    <ul class="bread-crumb">
+                        <li><a href="/version_predict?project={{project_name}}">预测工具</a></li>
+                    </ul>
+                </div>
+                <div class="main-wrapper">
+                    <div>
+
+                        <form role="form" class="form-horizontal validate" method="post" id="form" enctype="multipart/form-data" action="/version_predict/">
+                        <input style="display: none" name="project" value={{project_name}}>
+
+                        <div class="form-group">
+                            <label  class="col-sm-3 col-sm-offset-1 control-label">选择待预测版本：</label>
+                            <div class="col-sm-6">
+                                 {%for version in version_status%}
+                                 <div class="radio">
+                                    <label>
+                                        {%if version.1 == '1'%}
+                                        <input type="radio" class="select-version" name="selectVersion" value={{version.0}} checked>{{version.0}}<i class="fa fa-star"></i>
+                                        {%else%}
+                                        <input type="radio" class="select-version" name="selectVersion" value={{version.0}} >{{version.0}}
+                                        {%endif%}
+                                    </label>
+                                </div>
+                                {% endfor %}
+                            </div>                            
+                        </div>
+                        <div class="form-group">
+                            <label  class="col-sm-3 col-sm-offset-1 control-label">上传预测样本：</label>
+                            <div class="col-sm-6">
+                                <input type="file" class="form-control" id="field-file" name="upload-file" data-validate="required" data-message-required="必须上传样本文件"/>
+                                <div class="download-sample"><a href="/static/sample/predict_sample.xlsx">下载模板文件</a></div>
+                                <p style="color: red">第一列为空，后四列为id，主题，摘要，监控词</p>
+                            </div>
+                        </div>
+
+
+                        <div class="form-group">
+                            <div class="col-sm-6 col-sm-offset-4">
+                                <button type="button" id='brand_form' class="btn btn-blue btn-lg" onclick="checkData()">开始预测</button>
+                            </div>
+                        </div>
+                        </form>
+                        <div class="form-group" id="files-container">
+                            <!--<div class="col-sm-3 col-sm-offset-1 control-label">下载结果文件：</div>-->
+                            <div class="col-sm-8 col-sm-offset-2 files">
+                                <div class="row">
+                                    <div class="col-sm-3">结果文件：</div>
+                                    <div class="col-sm-9">
+                                        <ul>
+                                            {% for file in res_list %}
+                                            <li><a href="/static/{{project_name}}/output/{{ file }}">{{file}}</a></li>
+                                            {%endfor%}
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-10 more">
+                                <a class="show-all">显示全部</a>
+                                <a class="hide-old">隐藏旧文件</a>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div><!--row-->
+        </div><!--container-->
+        <footer class="main">
+            Copyright&copy; 2009-2017 Maixun Online
+        </footer>
+    </div><!--main-content-->
+</div>
+<script src="/static/js/gsap/main-gsap.js"></script>
+<script src="/static/js/bootstrap.js"></script>
+<script src="/static/js/resizeable.js"></script>
+<script src="/static/js/neon-custom.js"></script>
+<script src="/static/js/jquery.validate.min.js"></script>
+<script>
+    {% if result == '0' %}
+    alert('预测过程出现错误！')
+    {% endif %}
+    $(document).ready(function () {
+        $("#files-container .more a").click(function(){
+            $("#files-container .old, #files-container .show-all, #files-container .hide-old").toggle();
+
+        });
+    });
+    function checkData(){
+			if(!$("#field-file").val()){
+				alert("请先选择文件！");
+				return false;
+			}
+			var strs = $("#field-file").val().split('.');
+			if((strs[strs.length-1] != "xlsx")&&(strs[strs.length-1] != "xls")){
+				alert("请上传excel格式的文件！");
+				return false;
+			}
+			$("#form").submit();
+		};
+</script>
+</body>
+</html>

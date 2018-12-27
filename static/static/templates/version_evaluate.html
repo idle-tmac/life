@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>脉讯智能迭代学习系统</title>
+
+
+    <link rel="stylesheet" href="/static/css/font-icons/font-awesome/css/font-awesome.css">
+    <link rel="stylesheet" href="/static/css/bootstrap.css">
+    <link rel="stylesheet" href="/static/css/neon-core.css">
+    <link rel="stylesheet" href="/static/css/neon-theme.css">
+    <link rel="stylesheet" href="/static/css/neon-forms.css">
+    <link rel="stylesheet" href="/static/css/maixun-neon.css">
+    <link rel="stylesheet" href="/static/css/study.css">
+
+    <script src="/static/js/jquery-1.11.0.min.js"></script>
+
+    <!--[if lt IE 9]>
+    <script src="js/ie8-responsive-file-warning.js"></script><![endif]-->
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+
+
+</head>
+<body class="page-body page-with-nav">
+
+
+<div class="page-container horizontal-menu sidebar-collapsed">
+    <header class="navbar">
+        <div class="container">
+            <div class="navbar-inner">
+                <div class="navbar-brand">
+                    <img src="/static/images/logo_study.png">
+                </div>
+                <ul class="nav navbar-right pull-right">
+                    <li class="user">
+
+                            <img src="/static/images/usr_default.png" class="img-circle" width="20"/>{{user_name}}
+                    </li>
+
+                    <li>
+                        <a href="/logout">
+                            <i class="fa fa-sign-out"></i>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </header>
+    <div id="nav">
+        <ul>
+            <li><a href="/version_manage?project={{ project_name }}">版本管理</a></li>
+            <li class="active"><a href="/version_evaluate?project={{ project_name }}">版本评估</a></li>
+            <li><a href="/version_predict?project={{project_name}}">预测工具</a></li>
+            <li><a href="/version_cyberin_iteration?project={{project_name}}">cyberin迭代</a></li>
+            <li class="cur-project"><a href="/project_manage/" class="btn btn-default"><i class="fa fa-angle-right"></i>全部项目</a><span>项目：{{project_name}}</span> </li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <div class="container" style="min-height:400px;">
+            <div class="row">
+                <div id="target">
+                    <ul class="bread-crumb">
+                        <li><a href="#">版本评估</a></li>
+                    </ul>
+                </div>
+                <div class="main-wrapper">
+                    <div>
+                        <!--<div role="form" class="form-horizontal validate" method="post" id="form">-->
+                        <div class="form-horizontal validate" method="post" id="form">
+                        <div class="form-group select-version">
+                            <label for="field-1" class="col-sm-3 col-sm-offset-1 control-label">选择待评估版本：</label>
+                            <div class="col-sm-6">
+                                {% for version, version_path, version_status in versions %}
+                                  <div class="checkbox">
+                                    <label>
+                                        <input type="checkbox" class="select-version" name= "cb" value="{{version_path}}">{{version}}
+                                        {% if version_status == '1' %}
+                                            <i class="fa fa-star"></i>
+                                        {% endif %}
+                                    </label>
+                                </div>
+                                {% endfor %}
+                                <span class="custom-error">请至少选择2个版本</span>    
+
+                                                  
+                            </div>                            
+                        </div>
+                        <div class="form-group">
+                            <label for="field-1" class="col-sm-3 col-sm-offset-1 control-label">上传预测样本：</label>
+                            <div class="col-sm-6">
+                                <input id = "evaluate_file" type="file" class="form-control" name="upload-file" data-validate="required" data-message-required="必须上传样本文件"/>
+                                <div class="download-sample"><a href="/static/sample/evaluate_sample.xlsx">下载模板文件</a></div>
+                                <p style="color: red">前五列分别为:类别，id，主题，摘要，监控词</p>
+                            </div>
+                        </div>
+
+
+                        <div class="form-group">
+                            <div class="col-sm-6 col-sm-offset-4">
+                                <button type="submit" class="btn btn-blue btn-lg" id = "submitbtn">开始评估</button>
+                            </div>
+                        </div>
+                        <!--</form>-->
+                        </div>
+                    </div>
+
+                </div>
+            </div><!--row-->
+        </div><!--container-->
+        <footer class="main">
+            Copyright&copy; 2009-2017 Maixun Online
+        </footer>
+    </div><!--main-content-->
+</div>
+<script src="/static/js/gsap/main-gsap.js"></script>
+<script src="/static/js/bootstrap.js"></script>
+<script src="/static/js/resizeable.js"></script>
+<script src="/static/js/neon-custom.js"></script>
+<script src="/static/js/jquery.validate.min.js"></script>
+<script>
+    $(document).ready(function () {
+
+        $(".select-version").click(function(e){
+            var MAX = 5;
+            if ($(this).prop("checked")) {                
+                var curChecked = $(".select-version:checked").length;
+                if (curChecked > MAX) {
+                    alert("最多同时选择5个版本");
+                    $(this).prop("checked",false);
+                } 
+
+            };
+        })    
+        $("button[type='submit']").click(function(e){
+            $("span.custom-error").hide();
+            if ($(".select-version:checked").length<1) {
+                $(".select-version span.custom-error").show();
+                e.preventDefault();
+            };
+            if  ($(".select-version:checked").length>=1){
+                if ($("#evaluate_file").val() == ""){
+                    alert("必须上传样本文件");
+                }
+                else{
+
+                     var post_data = {}
+                     var r=document.getElementsByName("cb");
+                     var version_to_evaluate = new Array();
+                     for(var i=0;i<r.length;i++){
+                         //alert(r[i].checked);
+                         if(r[i].checked){
+                             var version_info = {}
+                             version_info['name'] = r[i].nextSibling.nodeValue.replace(/(^\s*)|(\s*$)/g, "");
+                             version_info['path'] = r[i].value
+                             version_to_evaluate.push(version_info)
+                             //alert(r[i].value+","+r[i].nextSibling.nodeValue);
+                         }
+                    }
+                    post_data['version_info'] =  version_to_evaluate
+                    post_data['project_name'] = "{{project_name}}";
+                    var j_post_data = JSON.stringify(post_data);
+
+                    var formData = new FormData();
+                    formData.append("evaluate_file", $('#evaluate_file').get(0).files[0]);
+                    formData.append("post_data", j_post_data);
+
+                    var j_evaluate_info = '';
+                    $.ajax({
+                          url: '/version_evaluate_exec/' ,
+                          type: 'POST',
+                          data: formData,
+                          async: false,
+                          cache: false,
+                          contentType: false,
+                          processData: false,
+                          success: function (returndata) {
+                              j_evaluate_info = returndata;
+                          },
+                          error: function (returndata) {
+                              alert('fail')
+                          }
+                    });
+
+//                    link = "/version_evaluate_effect?j_evaluate_info=" + JSON.stringify(j_evaluate_info);
+                    link = "/version_evaluate_effect?j_evaluate_info=" + j_evaluate_info;
+                    window.location.href = link;
+                }
+
+
+            }
+        });
+
+    });
+</script>
+</body>
+</html>

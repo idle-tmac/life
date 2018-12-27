@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>脉讯智能迭代学习系统</title>
+
+
+    <link rel="stylesheet" href="/static/css/font-icons/font-awesome/css/font-awesome.css">
+    <link rel="stylesheet" href="/static/css/bootstrap.css">
+    <link rel="stylesheet" href="/static/css/neon-core.css">
+    <link rel="stylesheet" href="/static/css/neon-theme.css">
+    <link rel="stylesheet" href="/static/css/neon-forms.css">
+    <link rel="stylesheet" href="/static/css/maixun-neon.css">
+    <link rel="stylesheet" href="/static/css/btnStyle.css">
+    <link rel="stylesheet" href="/static/css/study.css">
+
+    <script src="/static/js/jquery-1.11.0.min.js"></script>
+
+    <!--[if lt IE 9]>
+    <script src="js/ie8-responsive-file-warning.js"></script><![endif]-->
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+
+
+</head>
+<body class="page-body page-with-nav">
+
+
+<div class="page-container horizontal-menu sidebar-collapsed">
+    <header class="navbar">
+        <div class="container">
+            <div class="navbar-inner">
+                <div class="navbar-brand">
+                    <img src="/static/images/logo_study.png">
+                </div>
+                <ul class="nav navbar-right pull-right">
+                    <li class="user">
+
+                            <img src="/static/images/usr_default.png" class="img-circle" width="20"/>{{user_name}}
+                    </li>
+
+                    <li>
+                        <a href="/logout">
+                            <i class="fa fa-sign-out"></i>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </header>
+    <div id="nav">
+        <ul>
+            <li class="active"><a href="/version_manage?project={{project_name}}">版本管理</a></li>
+            <li><a href="/version_evaluate?project={{project_name}}">版本评估</a></li>
+            <li><a href="/version_predict?project={{project_name}}">预测工具</a></li>
+            <li><a href="/version_cyberin_iteration?project={{project_name}}">cyberin迭代</a></li>
+            <li class="cur-project"><a href="/project_manage/" class="btn btn-default"><i class="fa fa-angle-right"></i>全部项目</a><span>项目：{{ project_name }}</span> </li>
+            
+        </ul>
+    </div>
+    <div class="main-content">
+        <div class="container" style="min-height:400px;">
+            <div class="row">
+                <div id="target">
+                    
+                    <ul class="bread-crumb">
+                        <li><a href="/project_manage/">版本管理</a></li>
+                    </ul>
+                </div>
+                <div class="main-wrapper">
+                    <a type="button" class="btn btn-lg btn-default" onclick = "version_train()"><i class="fa fa-plus"></i>训练新版本</a>
+                    <br/><br/>
+                    <div id="remind"  style="display: none"><p style="color: red">训练过程中，请勿在当前页面进行其他操作</div>
+                    <table class="table table-bordered" id="version_table">
+                        <thead>
+                            <tr>
+                                <th>版本名称</th>
+                                <th>创建日期</th>
+                                <th>状态</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        {%for version in version_status%}
+                        <tr id="version_list">
+                            <td>{{version.0}}</td>
+                            <td>{{version.2}}</td>
+                            <td>
+                            {%if version.1 == '1'%}
+                            <i class="fa fa-star"></i>最优
+                            {%elif version.1 == '2'%}
+                            <i class="fa fa-cog fa-spin fa-fw"></i>模型训练中…
+                            {%elif version.1 == '3'%}
+                            模型训练失败
+                            {%else%}
+                            正常
+                            {%endif%}
+                            {%if version.1 != '2'%}
+                            <td>
+                                <a href="/version_manage/?project={{project_name}}&version={{version.0}}&operate=rename" class="btn-rename"><i class="fa fa-pencil"></i></a>
+                                <a href="/version_manage/?project={{project_name}}&version={{version.0}}&operate=download"><i class="fa fa-download"></i></a>
+                                <a href="#"  class="btn-paper-plane" onclick="online('{{version.0}}')"><i class="fa fa-paper-plane"></i></a>
+                                <a href="/version_manage/?project={{project_name}}&version={{version.0}}&operate=remove" class="btn-delete"
+                                   onclick="jump_delete_confirm('/version_manage/?project={{project_name}}&version={{version.0}}&operate=remove');return false;"><i class="fa fa-remove"></i></a>
+                            </td>
+                            {%endif%}
+                        </tr>
+                        {%endfor%}
+                        <!--<tr>-->
+                            <!--<td>MeadJohnson_20181217124035</td>-->
+                            <!--<td>2017-12-17</td>-->
+                            <!--<td><i class="fa fa-cog fa-spin fa-fw"></i>模型训练中…</td>-->
+                            <!--<td>-->
+
+                            <!--</td>-->
+                        <!--</tr>-->
+                    </table>
+                </div>
+            </div><!--row-->
+        </div><!--container-->
+        <footer class="main">
+            Copyright&copy; 2009-2017 Maixun Online
+        </footer>
+    </div><!--main-content-->
+</div>
+<!-- 弹窗 modal fade-->
+
+<div class="modal fade" id="modal-version-rename">
+    <div class="modal-dialog">
+        <div class="modal-content" >
+            <form role="form" class="form-horizontal validate" novalidate="novalidate" method="post"
+                  action="javascript:void(0);">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title">重命名版本</h4>
+                </div>
+
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="form-group">
+                            <label for="field-1" class="col-sm-3 col-sm-offset-1 control-label">版本名称：</label>
+                            <div class="col-sm-6">
+                                <input class="form-control" value="MeadJohnson_20181217124035"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-white" data-dismiss="modal">取消</button>
+                    <button class="btn btn-blue">确认</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modal-paper-plane">
+    <div class="modal-dialog">
+        <div class="modal-content" >
+            <form role="form" class="form-horizontal validate" novalidate="novalidate" method="post"
+                  action="javascript:void(0);">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title">上线申请</h4>
+                </div>
+
+
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="form-group">
+                            <label for="field-1" class="col-sm-3 col-sm-offset-1 control-label">项目名称</label>
+                            <div class="col-sm-6">
+                                <input class="form-control" style="font-weight:bold;" value="{{project_name}}" disabled/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="field-1" class="col-sm-3 col-sm-offset-1 control-label">版本名称</label>
+                            <div class="col-sm-6">
+                                <input class="form-control"  id="online_version_name" style="font-weight:bold;" value="" disabled/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="field-1" class="col-sm-3 col-sm-offset-1 control-label">FID</label>
+                            <div class="col-sm-6">
+                                <input class="form-control" id = "FID" value=""/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="field-1" class="col-sm-3 col-sm-offset-1 control-label">任务类型</label>
+                            <div class="col-sm-6">
+                                 <select class="form-control" id = "task">
+                                        <option>噪音</option>
+                                        <option>正负面</option>
+                                 </select>                               
+                            </div>
+                        </div>
+                          <div class="form-group">
+                            <label for="field-1" class="col-sm-3 col-sm-offset-1 control-label">上线详情：</label>
+                            <div class="col-sm-6">
+                                <textarea id="description" rows="5" cols="50">
+    上线人：
+
+版本准确率：
+
+训练集规模：
+
+  版本描述：
+                                </textarea>
+                                <!--<input  type="text" style="width:50; height:100" value=""/>-->
+                            </div>
+                        </div>
+                         <div class="form-group">
+                            <label for="field-1" class="col-sm-3 col-sm-offset-1 control-label" >邮件通知</label>
+                            <div class="col-sm-6">
+                                <input class="form-control" id="email" value="hongyu.liu;caiqing.wu;gerry.zhang;xiaopeng.zhang"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="modal-footer">
+                    <button class="btn btn-white" data-dismiss="modal">取消</button>
+                    <button class="btn btn-blue" onclick="online_ensure()" >确认</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modal-delete-confirm">
+    <div class="modal-dialog">
+        <div class="modal-content" >
+            <form role="form" class="form-horizontal validate" novalidate="novalidate" method="post"
+                  action="javascript:void(0);">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title">删除确认</h4>
+                </div>
+
+                <div class="modal-body">
+                    <div class="alert alert-danger">确认删除？<strong>本操作无法撤销。</strong></div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-white" data-dismiss="modal">取消</button><button class="btn btn-blue" onclick = "project_delete_ensure()">确认</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- Bottom Scripts -->
+
+<script src="/static/js/bootstrap.js"></script>
+<!--
+<script src="js/gsap/main-gsap.js"></script>
+<script src="js/jquery-ui/js/jquery-ui-1.10.3.minimal.min.js"></script>
+
+<script src="js/resizeable.js"></script>
+<script src="js/neon-api.js"></script>
+<script src="js/neon-custom.js"></script>
+<script src="js/jquery.validate.min.js"></script>
+<script src="js/toastr.js"></script>
+<script src="js/maixun.js"></script>
+-->
+<script>
+    var del_href = ''
+    {%if download_result%}
+        window.open('{{download_path}}');
+    {% endif %}
+
+    {%if train_status%}
+        $("#remind").show();
+        var value=$('#version_list').length;
+        if(value > 0){
+            $("#version_list:first").before('<tr>' +
+                '<td>{{train_version}}</td>' + '<td>{{show_time}}</td>'
+                + '<td><i class="fa fa-cog fa-spin fa-fw"></i>模型训练中…</td>' +'</tr>');
+
+        }
+        else{
+            $("#version_table").empty().append('<thead>' +
+                '<tr>' +
+                '<th>版本名称</th>' +
+                '<th>创建日期</th>' +
+                '<th>状态</th>' +
+                '<th>操作</th>' +
+                '</tr>' +
+                '</thead>'+'<tr>' +
+                '<td>{{train_version}}</td>' + '<td>{{show_time}}</td>'
+                + '<td><i class="fa fa-cog fa-spin fa-fw"></i>模型训练中…</td>' +'</tr>');
+        }
+        location.href= '/version_manage?project={{ project_name }}&version={{train_version}}&tem_path={{tem_path}}&operate=train&email={{email}}';
+    {% endif %}
+
+    function version_train(){
+        var project_name = "{{project_name}}";
+        link = "/version_train?project=" + project_name;
+        window.location.href = link;
+    };
+
+    function online(version_name){
+        $("#online_version_name").val(version_name);
+    }
+
+    function online_ensure(){
+ 
+        project_name = "{{project_name}}"
+        version_name = $("#online_version_name").val()
+        description = $("#description").val()
+        fid = $("#FID").val()
+        var d_map = {'噪音': 'noise', '正负面' : 'semeval'}
+        task = d_map[$("#task").val()]
+        if(fid == "") {
+            alert('请填写fid');
+            return false;
+        }
+        email = $("#email").val()
+
+        var post_data = {};
+        post_data['version_name'] = version_name;
+        post_data['project_name'] = project_name;
+        post_data['description'] = description;
+        post_data['fid'] = fid;
+        post_data['email'] = email;
+        post_data['task'] = task;
+
+
+        $.post('/version_online/', post_data,
+            function (data) {
+                if (data == 'false') {
+                  alert("上线失败");
+                }
+            }
+        );
+        $("#modal-paper-plane").modal("hide");
+    }
+
+    function jump_delete_confirm(href_data) {
+        del_href = href_data;
+        $(".btn-delete").click(function(){
+            $("#modal-delete-confirm").modal("show");
+        });
+    };
+
+    function project_delete_ensure() {
+        location.href= del_href;
+    }
+    $(document).ready(function () {
+        $(".btn-rename").click(function(){
+            $("#modal-version-rename").modal("show");
+        });
+
+        $(".btn-delete").click(function(){
+            $("#modal-delete-confirm").modal("show");
+        });
+
+        $(".btn-paper-plane").click(function(){
+            $("#modal-paper-plane").modal("show");
+        });
+    });
+</script>
+</body>
+</html>
